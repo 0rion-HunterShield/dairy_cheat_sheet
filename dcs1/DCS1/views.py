@@ -32,25 +32,31 @@ class FileParser(TemplateView):
         if context['upload_form'].is_valid():
             data=request.FILES['file']
             context['results']=[]
-            with open("tmp.csv","w") as x:
-                x.write(data.read().decode('utf-8'))
-            with open('tmp.csv','r') as x:
-                try:
-                    csvReader=csv.reader(x,delimiter=',')
-                    line=0
-                    for num,row in enumerate(csvReader):
-                        if num > 0:
-                            print(row)
+            def writeTMP():
+                with open("tmp.csv","w") as x:
+                    x.write(data.read().decode('utf-8'))
+            def readTMP():
+                with open('tmp.csv','r') as x:
                     try:
-                        obj=DairyProducts.objects.get(barcode=row[0])
-                        context['results'].append((obj,row[1]))
-                    except Exception as e:
-                        print(" {code} - does not exist".format(code=row[0]))
+                        csvReader=csv.reader(x,delimiter=',')
+                        line=0
+                        for num,row in enumerate(csvReader):
+                            if num > 0:
+                                print(row)
+                                try:
+                                    obj=DairyProducts.objects.get(barcode=row[0])
+                                    context['results'].append((obj,row[1]))
+                                except Exception as e:
+                                    print(" {code} - does not exist".format(code=row[0]))
 
-                except Exception as e:
-                    raise e
-            Path('tmp.csv').unlink()
-            
+                    except Exception as e:
+                        raise e
+            def cleanup():
+                Path('tmp.csv').unlink()
+            writeTMP()
+            readTMP()
+            cleanup()
+        
         return render(request,self.template_name,context=context)
 
     

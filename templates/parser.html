@@ -1,21 +1,27 @@
 <html>
 	<head>
 		<title>CSV to Viewable</title>
+<style>
+	table,tr,th,td { border:1px solid black; border-collapse: collapse; font-size:x-large}
+	td {background:darkgrey;padding:3px;color:white;font-size:x-large}
+</style>
 	</head>
 	<body>
-		<form method="post" enctype="multipart/form-data">
-			{%csrf_token%}
-			{{upload_form}}	
-			<input type="submit" value="OK" >
-		</form>
+		<div id="uploader" style="background:red;color:white;border:2px solid black;padding:2px">
+			<form method="post" enctype="multipart/form-data">
+				{%csrf_token%}
+				{{upload_form}}	
+				<input type="submit" value="OK" >
+			</form>
+		</div>
 		<div id="results">
 			<table>
 				<tr>
 					<th>Name</th>
 					<th>Barcode</th>
 					<th>Price</th>
-					<th>Count</th>
 					<th>Bar</th>
+					<th>Count</th>
 				</tr>
 
 				{%for row in results%}
