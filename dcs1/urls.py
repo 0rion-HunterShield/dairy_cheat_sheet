@@ -20,4 +20,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('uploader/<str:section>/<str:file>',views.DataReceiver.as_view(),name="uploader"),
     path('reader/',views.FileParser.as_view(),name="reader"),
+    path('',views.FileParser.as_view(),name="reader"),
 ]
