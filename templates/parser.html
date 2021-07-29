@@ -1,0 +1,33 @@
+<html>
+	<head>
+		<title>CSV to Viewable</title>
+	</head>
+	<body>
+		<form method="post" enctype="multipart/form-data">
+			{%csrf_token%}
+			{{upload_form}}	
+			<input type="submit" value="OK" >
+		</form>
+		<div id="results">
+			<table>
+				<tr>
+					<th>Name</th>
+					<th>Barcode</th>
+					<th>Price</th>
+					<th>Count</th>
+					<th>Bar</th>
+				</tr>
+
+				{%for row in results%}
+				<tr>
+					<td>{{row.0.name}}</td>
+					<td>{{row.0.barcode}}</td>
+					<td>{{row.0.price}}</td>
+					<td><img src="{{row.0.bar_img}}" /></td>
+					<td>{{row.1}}</td>
+				</tr>
+				{%endfor%}
+			</table>
+		</div>
+	</body>
+</html>

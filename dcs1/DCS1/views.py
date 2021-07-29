@@ -10,7 +10,50 @@ from barcode.writer import ImageWriter
 import base64
 import django
 from pathlib import Path
+from django.views.generic import TemplateView
+from django import forms
+from django.utils.decorators import method_decorator
+from django.views.decorators.csrf import ensure_csrf_cookie
+import csv
 
+class UploadFileForm(forms.Form):
+    file = forms.FileField()
+
+@method_decorator(ensure_csrf_cookie,name="dispatch")
+class FileParser(TemplateView):
+    template_name="parser.html"
+    def get(self,request):
+        context=dict()
+        context['upload_form']=UploadFileForm()
+        return render(request,self.template_name,context=context)
+    def post(self,request):
+        context={}
+        context['upload_form']=UploadFileForm(request.POST,request.FILES)
+        if context['upload_form'].is_valid():
+            data=request.FILES['file']
+            context['results']=[]
+            with open("tmp.csv","w") as x:
+                x.write(data.read().decode('utf-8'))
+            with open('tmp.csv','r') as x:
+                try:
+                    csvReader=csv.reader(x,delimiter=',')
+                    line=0
+                    for num,row in enumerate(csvReader):
+                        if num > 0:
+                            print(row)
+                    try:
+                        obj=DairyProducts.objects.get(barcode=row[0])
+                        context['results'].append((obj,row[1]))
+                    except Exception as e:
+                        print(" {code} - does not exist".format(code=row[0]))
+
+                except Exception as e:
+                    raise e
+            Path('tmp.csv').unlink()
+            
+        return render(request,self.template_name,context=context)
+
+    
 class DataReceiver(generics.GenericAPIView):
     authentication_classes=()
     permission_classes=()
@@ -38,8 +81,8 @@ class DataReceiver(generics.GenericAPIView):
                 imgio=BytesIO()
                 barcode.Code128(i[0],writer=ImageWriter()).write(imgio)
                 imgio.seek(0)
-                b64=base64.b64encode(imgio.read())
-                
+                b64=base64.b64encode(imgio.read()).decode('utf-8')
+                b64='data:image/png;base64,'+b64
                 price=i[2].replace(' ','')
                 try:
                     dairy_products=DairyProducts.objects.create(

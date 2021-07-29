@@ -19,4 +19,5 @@ from dcs1.DCS1 import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('uploader/<str:section>/<str:file>',views.DataReceiver.as_view(),name="uploader"),
+    path('reader/',views.FileParser.as_view(),name="reader"),
 ]
