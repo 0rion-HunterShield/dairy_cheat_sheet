@@ -24,10 +24,12 @@ class FileParser(TemplateView):
     template_name="parser.html"
     def get(self,request):
         context=dict()
+        context['title']="Parse Product CSV"
         context['upload_form']=UploadFileForm()
         return render(request,self.template_name,context=context)
     def post(self,request):
         context={}
+        context['title']="Parse Product CSV"
         context['upload_form']=UploadFileForm(request.POST,request.FILES)
         if context['upload_form'].is_valid():
             data=request.FILES['file']
@@ -44,7 +46,7 @@ class FileParser(TemplateView):
                             if num > 0:
                                 print(row)
                                 try:
-                                    obj=DairyProducts.objects.get(barcode=row[0])
+                                    obj=Products.objects.get(barcode=row[0])
                                     context['results'].append((obj,row[1]))
                                 except Exception as e:
                                     print(" {code} - does not exist".format(code=row[0]))
@@ -57,6 +59,60 @@ class FileParser(TemplateView):
             readTMP()
             cleanup()
         
+        return render(request,self.template_name,context=context)
+
+def process(rows):
+            duplicates=[]
+            for i in rows:
+                imgio=BytesIO()
+                barcode.Code128(i[0],writer=ImageWriter()).write(imgio)
+                imgio.seek(0)
+                b64=base64.b64encode(imgio.read()).decode('utf-8')
+                b64='data:image/png;base64,'+b64
+                price=i[2].replace(' ','')
+                try:
+                    dairy_products=Products.objects.create(
+                            barcode=i[0],name=i[1],price=price,bar_img=b64)
+                except django.db.utils.IntegrityError as e:
+                    duplicates.append("{dup} is a duplicate entry, skipping!".format(dup=i[0]))
+
+                except Exception as e:
+                    print(e)
+            return duplicates
+
+@method_decorator(ensure_csrf_cookie,name="dispatch")
+class DataReciever_viewable(TemplateView):
+    template_name="csv_uploader.html"
+    def get(self,request):
+        context={}
+        context['title']="Upload CSV of Product Info"
+        context['csv_form']=UploadFileForm()
+        context['status']='Ready'
+
+
+        return render(request,self.template_name,context=context)
+
+    def post(self,request):
+        context={}
+        context['title']="Upload CSV of Product Info"
+        context['csv_form']=UploadFileForm(request.POST,request.FILES)
+        if context['csv_form'].is_valid():
+            print(request.FILES)
+            def mktemp():
+                with open("tmp.csv","wb") as out:
+                    out.write(request.FILES['file'].read())
+            def readTmp():
+                with open("tmp.csv","r") as in_:
+                    reader=csv.reader(in_,delimiter=',')    
+                    for i in reader:
+                        if len(i) < 3:
+                            raise Exception("too few columns")
+                        break
+                    context['duplicates']=process(reader)
+            mktemp()
+            readTmp()
+            context['status']='Done'
+
         return render(request,self.template_name,context=context)
 
     
@@ -82,22 +138,7 @@ class DataReceiver(generics.GenericAPIView):
             rows=cursor.fetchall()
             return rows
 
-        def process():
-            for i in rows:
-                imgio=BytesIO()
-                barcode.Code128(i[0],writer=ImageWriter()).write(imgio)
-                imgio.seek(0)
-                b64=base64.b64encode(imgio.read()).decode('utf-8')
-                b64='data:image/png;base64,'+b64
-                price=i[2].replace(' ','')
-                try:
-                    dairy_products=DairyProducts.objects.create(
-                            barcode=i[0],name=i[1],price=price,bar_img=b64)
-                except django.db.utils.IntegrityError as e:
-                    print("{dup} is a duplicate entry, skipping!".format(dup=i[0]))
-                except Exception as e:
-                    print(e)
-
+        process(rows)
         def cleanup():
             if Path(file).exists():
                 Path(file).unlink()

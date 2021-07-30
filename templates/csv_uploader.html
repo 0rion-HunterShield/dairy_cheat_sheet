@@ -1,0 +1,18 @@
+{%extends 'base.html'%}
+{%block content_root%}
+	<div id="uploader">
+		<form method="post" enctype="multipart/form-data">
+				{%csrf_token%}
+				{{csv_form}}	
+				<input type="submit" value="OK" >
+		</form>
+	</div>
+	<div id="status">
+		{{status}}
+	</div>
+	<div id="duplicates">
+		{%for row in duplicates%}
+			<pre>{{row}}</pre>
+		{%endfor%}
+	</div>
+{%endblock%}
