@@ -1,15 +1,19 @@
 <html>
 	<head>
 		<title>{{title}}</title>
-		<meta name="viewport" content="initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,width=device-width,user-scalable=no" />
 <style>
 	table,tr,th,td { border:1px solid black; border-collapse: collapse; font-size:x-large}
 	td {background:darkgrey;padding:3px;color:white;font-size:x-large}
+	#nav {background:url('https://i1.wp.com/www.eatthis.com/wp-content/uploads/2021/06/milk.jpg?resize=640%2C360&ssl=1');color:white;font-size:xx-large}
+	a {border:1px solid black;}
 </style>
 	</head>
 	<body>
-	<a href="/uploader2/">Upload new product csv</a>
-	<a href="/reader/">Get Product Data From CSV</a>
+	<div id="nav">
+		<a href="/admin">Account</a>
+		<a href="/uploader2/">Upload Product CSV</a>
+		<a href="/reader/">CSV2Product</a>
+	</div>
 	{%block content_root%}
 	{%endblock%}
 	</body>

@@ -1,11 +1,16 @@
 {%extends 'base.html'%}
 {%block content_root%}
+		<style>
+			#results { width:95%;height:75%;overflow: scroll;}
 
+
+
+		</style>
 		<div id="uploader" style="background:red;color:white;border:2px solid black;padding:2px">
 			<form method="post" enctype="multipart/form-data">
 				{%csrf_token%}
-				{{upload_form}}	
-				<input type="submit" value="OK" >
+				{{upload_form}}
+				<input type="submit" value="Upload" >
 			</form>
 		</div>
 		<div id="results">
@@ -28,6 +33,12 @@
 				</tr>
 				{%endfor%}
 			</table>
+			<div id="errors">
+				<h3>Errors</h3>
+				<span id="writeTMP">writeTMP: {{errors.writeTMP}}</span><br>
+				<span id="readTMP">readTMP: {{errors.readTMP}}</span><br>
+				<span id="cleanup">cleanup: {{errors.cleanup}}</span><br>
+			</div>
 		</div>
 
 {%endblock%}

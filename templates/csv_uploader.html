@@ -1,14 +1,24 @@
 {%extends 'base.html'%}
 {%block content_root%}
+<style>
+	#uploader {background:lightblue;color:black;border:1px solid gray}
+	#status {background:lightgrey;color:black;opacity: 75%}
+	#duplicates {height:50%;overflow:scroll}
+</style>
 	<div id="uploader">
 		<form method="post" enctype="multipart/form-data">
 				{%csrf_token%}
-				{{csv_form}}	
-				<input type="submit" value="OK" >
+				{{csv_form}}
+				<input type="submit" value="Upload" >
 		</form>
 	</div>
 	<div id="status">
 		{{status}}
+	</div>
+	<div id="errors">
+		<h3>Errors</h3>
+		<span id='mktemp'>mktemp: {{mktemp}}</span><br>
+		<span id='readTMP'>readTMP: {{readTMP}}</span><br>
 	</div>
 	<div id="duplicates">
 		{%for row in duplicates%}
