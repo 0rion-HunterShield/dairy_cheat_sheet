@@ -1,0 +1,48 @@
+{% extends 'base.html'%}
+{%block content_root%}
+<style>
+  #results {
+    height: 85%;
+    overflow: auto;
+  }
+  #search_product {
+    margin: auto;
+    margin-top: 10;
+    margin-bottom: 3;
+    border: 1px solid gray;
+    width: 100%;
+    background-color: aliceblue;
+    padding: 5;
+    align-items: center;
+    display: flex;
+    flex-flow: row;
+    justify-content: center;
+    box-shadow: 1px 1px lightslategrey;
+}
+</style>
+<div id="search_product">
+  <form method="get">
+    {{search_form}}
+    <input type="submit" value="Search" />
+  </form>
+</div>
+<div id="results">
+  <table name="results">
+    <tr>
+      <th>Barcode</th>
+      <th>Name</th>
+      <th>Price</th>
+      <th>Scan</th>
+    </tr>
+    {%for row in results %}
+    <tr>
+      <td>{{row.barcode}}</td>
+      <td>{{row.name}}</td>
+      <td>{{row.price}}</td>
+      <td><img src="{{row.scan}}" /></td>
+    </tr>
+    {%endfor%}
+  </table>
+</div>
+
+{%endblock%}

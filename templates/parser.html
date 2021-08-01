@@ -1,17 +1,51 @@
 {%extends 'base.html'%}
 {%block content_root%}
 		<style>
-			#results { width:95%;height:75%;overflow: scroll;}
-
-
+		#results {
+									    background-color: beige;
+									    width: auto;
+									    height: 80%;
+									    overflow: auto;
+									    border: 1px solid gray;
+									    box-shadow: 1px 1px 3px black;
+									    margin-top: 6px;
+									    padding: 3px;
+											}
+			#clear_db {
+									    background-color: #e4ff00ad;
+									    color: white;
+									    border: 1px dashed black;
+									    flex-flow: row;
+									    display: flex;
+									    justify-content: center;
+									    padding: 5;
+									    border: 2px dashed #0a0a0a;
+									    margin: 2;
+									    box-shadow: 1px 1px 3px black;
+											}
+			div[name='get_products'] {
+									    background: #ff00007a;
+									    color: white;
+									    border: 2px solid black;
+									    padding: 2px;
+									    display: flex;
+									    flex-flow: row;
+									    justify-content: center;
+									    font-size: x-large;
+											}
 
 		</style>
-		<div id="uploader" style="background:red;color:white;border:2px solid black;padding:2px">
-			<form method="post" enctype="multipart/form-data">
+		<div name="get_products" id="uploader">
+			<form method="post" enctype="multipart/form-data" name="get_products">
 				{%csrf_token%}
 				{{upload_form}}
-				<input type="submit" value="Upload" >
+				<input type="submit" value="Upload" name="get_products" >
 			</form>
+		</div>
+		<form method="post">
+		{%csrf_token%}
+		<div id="clear_db">
+				<input type="submit" value="Clear DB" name="clear_db" >
 		</div>
 		<div id="results">
 			<table>
@@ -21,16 +55,20 @@
 					<th>Price</th>
 					<th>Bar</th>
 					<th>Count</th>
+					<th>Delete</th>
 				</tr>
 
+
 				{%for row in results%}
-				<tr>
-					<td>{{row.0.name}}</td>
-					<td>{{row.0.barcode}}</td>
-					<td>{{row.0.price}}</td>
-					<td><img src="{{row.0.bar_img}}" /></td>
-					<td>{{row.1}}</td>
-				</tr>
+					<tr>
+						<td>{{row.0.name}}</td>
+						<td>{{row.0.barcode}}</td>
+						<td>{{row.0.price}}</td>
+						<td><img src="{{row.2}}" /></td>
+						<td>{{row.1}}</td>
+						<td><input type="submit" value="{{row.0.barcode}}" name="delete" ></td>
+					</tr>
+				</form>
 				{%endfor%}
 			</table>
 			<div id="errors">
